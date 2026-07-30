@@ -1,3 +1,6 @@
+# Base de données locale
+*.db
+
 # Logs
 logs
 *.log

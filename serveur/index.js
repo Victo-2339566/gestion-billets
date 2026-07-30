@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const routesBillets = require('./routes/creerBillet');
+const routesBillets = require('./routes/billets');
 
 const app = express();
 const PORT = 3001;
