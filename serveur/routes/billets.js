@@ -7,6 +7,10 @@ const {
     modifierStatut,
     supprimerBillet,
 } = require('../services/billetService');
+const {
+    suggererCategorieEtPriorite,
+    proposerDepannage,
+} = require('../services/suggestionService');
 
 // Crée un nouveau billet
 router.post('/', (req, res) => {
@@ -15,6 +19,38 @@ router.post('/', (req, res) => {
         res.status(201).json(nouveauBillet);
     } catch (erreur) {
         res.status(400).json({ erreur: erreur.message });
+    }
+});
+
+// Suggère une catégorie et une priorité via l'IA locale (Ollama), à partir du titre et de la description
+router.post('/suggestion', async (req, res) => {
+    const { titre, description } = req.body;
+
+    if (!titre || !description) {
+        return res.status(400).json({ erreur: 'Le titre et la description sont requis pour la suggestion.' });
+    }
+
+    try {
+        const suggestion = await suggererCategorieEtPriorite(titre, description);
+        res.json(suggestion);
+    } catch (erreur) {
+        res.status(502).json({ erreur: erreur.message });
+    }
+});
+
+// Propose des étapes de dépannage de base via l'IA locale (Ollama), avant de créer un billet
+router.post('/depannage', async (req, res) => {
+    const { titre, description } = req.body;
+
+    if (!titre || !description) {
+        return res.status(400).json({ erreur: 'Le titre et la description sont requis pour le dépannage.' });
+    }
+
+    try {
+        const resultat = await proposerDepannage(titre, description);
+        res.json(resultat);
+    } catch (erreur) {
+        res.status(502).json({ erreur: erreur.message });
     }
 });
 

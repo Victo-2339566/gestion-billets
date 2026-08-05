@@ -13,6 +13,8 @@ function App() {
     const [billetAModifier, setBilletAModifier] = useState(null);
     const [messageStatut, setMessageStatut] = useState({ texte: '', type: 'succes' });
     const [vue, setVue] = useState('accueil');
+    const [role, setRole] = useState('utilisateur');
+    const [themeClair, setThemeClair] = useState(false);
     const [recherche, setRecherche] = useState('');
     const [filtreStatut, setFiltreStatut] = useState('');
     const [filtrePriorite, setFiltrePriorite] = useState('');
@@ -26,21 +28,38 @@ function App() {
     }, []);
 
     // Récupère la liste des billets depuis le serveur, selon la recherche et les filtres actifs
+    // Le filtrage par statut/priorité est réservé à l'Admin (vue Utilisateur = consultation simple)
     const chargerBillets = () => {
         const parametres = new URLSearchParams();
         if (recherche) parametres.set('recherche', recherche);
-        if (filtreStatut) parametres.set('statut', filtreStatut);
-        if (filtrePriorite) parametres.set('priorite', filtrePriorite);
+        if (role === 'admin') {
+            if (filtreStatut) parametres.set('statut', filtreStatut);
+            if (filtrePriorite) parametres.set('priorite', filtrePriorite);
+        }
 
         fetch(`${API_URL}/billets?${parametres}`)
             .then(res => res.json())
             .then(setBillets);
     };
 
-    // Recharge la liste au chargement et à chaque changement de la recherche ou des filtres
+    // Recharge la liste au chargement et à chaque changement de la recherche, des filtres ou du rôle
     useEffect(() => {
         chargerBillets();
-    }, [recherche, filtreStatut, filtrePriorite]);
+    }, [recherche, filtreStatut, filtrePriorite, role]);
+
+    // La vue Utilisateur n'a accès qu'à la création : on force cet onglet
+    // dès qu'on n'est pas Admin (au chargement et à chaque changement de rôle)
+    useEffect(() => {
+        if (role !== 'admin') {
+            setVue('creation');
+        }
+    }, [role]);
+
+    // Le fond de page vit sur <body> (pas sur .conteneur) pour couvrir tout
+    // l'écran, même l'espace autour du contenu centré
+    useEffect(() => {
+        document.body.dataset.theme = themeClair ? 'clair' : 'sombre';
+    }, [themeClair]);
 
     const afficherSucces = (texte) => setMessageStatut({ texte, type: 'succes' });
     const afficherErreur = (texte) => setMessageStatut({ texte, type: 'erreur' });
@@ -109,30 +128,57 @@ function App() {
             <h1>Système de gestion de billets</h1>
             <p className="statut-serveur">Statut du serveur : {message || 'Chargement...'}</p>
 
+            <button
+                className="bouton-theme"
+                onClick={() => setThemeClair(!themeClair)}
+                title={themeClair ? 'Passer au thème sombre' : 'Passer au thème clair'}
+            >
+                {themeClair ? '🌙' : '☀️'}
+            </button>
+
+            <div className="selecteur-role">
+                <button
+                    className={`role-bouton ${role === 'utilisateur' ? 'role-actif' : ''}`}
+                    onClick={() => setRole('utilisateur')}
+                >
+                    Utilisateur
+                </button>
+                <button
+                    className={`role-bouton ${role === 'admin' ? 'role-actif' : ''}`}
+                    onClick={() => setRole('admin')}
+                >
+                    Admin
+                </button>
+            </div>
+
             <MessageStatut message={messageStatut.texte} type={messageStatut.type} />
 
             <nav className="onglets">
-                <button
-                    className={`onglet ${vue === 'accueil' ? 'onglet-actif' : ''}`}
-                    onClick={() => setVue('accueil')}
-                >
-                    Accueil
-                </button>
+                {role === 'admin' && (
+                    <button
+                        className={`onglet ${vue === 'accueil' ? 'onglet-actif' : ''}`}
+                        onClick={() => setVue('accueil')}
+                    >
+                        Accueil
+                    </button>
+                )}
                 <button
                     className={`onglet ${vue === 'creation' ? 'onglet-actif' : ''}`}
                     onClick={() => setVue('creation')}
                 >
                     Créer un billet
                 </button>
-                <button
-                    className={`onglet ${vue === 'liste' ? 'onglet-actif' : ''}`}
-                    onClick={() => setVue('liste')}
-                >
-                    Liste des billets
-                </button>
+                {role === 'admin' && (
+                    <button
+                        className={`onglet ${vue === 'liste' ? 'onglet-actif' : ''}`}
+                        onClick={() => setVue('liste')}
+                    >
+                        Liste des billets
+                    </button>
+                )}
             </nav>
 
-            {vue === 'accueil' && <Accueil billets={billets} />}
+            {vue === 'accueil' && <Accueil />}
 
             {vue === 'creation' && (
                 <div className="carte">
@@ -156,25 +202,28 @@ function App() {
                         onChange={(e) => setRecherche(e.target.value)}
                     />
 
-                    <div className="filtres">
-                        <select value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
-                            <option value="">Tous les statuts</option>
-                            <option value="Ouvert">Ouvert</option>
-                            <option value="En cours">En cours</option>
-                            <option value="Résolu">Résolu</option>
-                            <option value="Fermé">Fermé</option>
-                        </select>
+                    {role === 'admin' && (
+                        <div className="filtres">
+                            <select value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
+                                <option value="">Tous les statuts</option>
+                                <option value="Ouvert">Ouvert</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Résolu">Résolu</option>
+                                <option value="Fermé">Fermé</option>
+                            </select>
 
-                        <select value={filtrePriorite} onChange={(e) => setFiltrePriorite(e.target.value)}>
-                            <option value="">Toutes les priorités</option>
-                            <option value="Basse">Basse</option>
-                            <option value="Moyenne">Moyenne</option>
-                            <option value="Haute">Haute</option>
-                        </select>
-                    </div>
+                            <select value={filtrePriorite} onChange={(e) => setFiltrePriorite(e.target.value)}>
+                                <option value="">Toutes les priorités</option>
+                                <option value="Basse">Basse</option>
+                                <option value="Moyenne">Moyenne</option>
+                                <option value="Haute">Haute</option>
+                            </select>
+                        </div>
+                    )}
 
                     <ListeBillets
                         billets={billets}
+                        role={role}
                         onModifier={gererModifier}
                         onChangerStatut={changerStatut}
                         onSupprimer={supprimerBillet}

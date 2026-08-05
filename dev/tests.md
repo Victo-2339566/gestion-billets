@@ -21,7 +21,7 @@ Colonnes :
 | 6 | Description absente | pas de champ description | 400, "La description est obligatoire." | Réussi |
 | 7 | Catégorie vide | categorie: "" | 400, "La catégorie est obligatoire." | Réussi |
 | 8 | Catégorie absente | pas de champ categorie | 400, "La catégorie est obligatoire." | Réussi |
-| 9 | Priorité absente | pas de champ priorite | 201, billet créé avec priorite: "" | Réussi |
+| 9 | Priorité absente | pas de champ priorite | 400, "La priorité est obligatoire." (règle ajoutée à la fonctionnalité 5 du Livrable 2) | Réussi |
 | 10 | Espaces en début/fin de titre, description, catégorie | "  Titre  " | Champs enregistrés sans les espaces (trim) | Réussi |
 | 11 | Identifiants uniques et croissants | plusieurs créations successives | id auto-incrémenté à chaque billet | Réussi |
 | 12 | Statut par défaut | tout billet créé | statut = "Ouvert" | Réussi |
@@ -37,8 +37,8 @@ Colonnes :
 | 17 | Soumission valide | tous les champs remplis, clic sur "Créer le billet" | message "Billet #X créé avec succès." affiché | Réussi |
 | 18 | Réinitialisation après succès | après soumission valide | tous les champs du formulaire redeviennent vides | Réussi |
 | 19 | Soumission avec titre vide | titre laissé vide | message d'erreur "Le titre est obligatoire." affiché | Réussi |
-| 20 | Soumission avec description vide | description laissée vide | message d'erreur "La description est obligatoire." affiché | À faire |
-| 21 | Soumission avec catégorie non choisie | catégorie laissée sur "-- Choisir --" | message d'erreur "La catégorie est obligatoire." affiché | À faire |
+| 20 | Soumission avec description vide | description laissée vide | message d'erreur "La description est obligatoire." affiché | Réussi |
+| 21 | Soumission avec catégorie non choisie | catégorie laissée sur "-- Choisir --" | message d'erreur "La catégorie est obligatoire." affiché | Réussi |
 | 22 | Sélection de chaque catégorie (Bug, Amélioration, Question, Autre) | choisir chaque option | valeur correctement envoyée et enregistrée | À faire |
 | 23 | Sélection de chaque priorité (Basse, Moyenne, Haute) | choisir chaque option | valeur correctement envoyée et enregistrée | À faire |
 | 24 | Serveur injoignable | serveur Express arrêté | "Impossible de joindre le serveur" affiché | À faire |
@@ -188,6 +188,172 @@ Colonnes :
 
 ---
 
+## Fonctionnalité bonus — Suggestion catégorie/priorité par IA locale (Ollama)
+
+### Serveur (route POST /billets/suggestion)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 84 | Suggestion pour un bug évident | titre/description décrivant un bug | catégorie "Bug" retournée | Réussi |
+| 85 | Suggestion pour une amélioration | titre/description décrivant une demande de fonctionnalité | catégorie "Amélioration" retournée | Réussi |
+| 86 | Suggestion pour une question | titre/description formulant une question | catégorie "Question" retournée | Réussi |
+| 87 | Priorité selon l'urgence | description signalant une panne totale et urgente | priorité "Haute" retournée | Réussi |
+| 88 | Champ titre ou description manquant | un des deux champs absent | 400, "Le titre et la description sont requis pour la suggestion." | Réussi |
+
+### Client (bouton "Suggérer catégorie/priorité (IA)")
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 89 | Suggestion appliquée aux champs | remplir titre/description, cliquer sur le bouton | les menus déroulants Catégorie et Priorité se remplissent avec la suggestion | Réussi |
+| 90 | Message pendant le chargement | clic sur le bouton | texte du bouton change pour "Suggestion en cours..." pendant l'appel | Réussi |
+| 91 | Champs vides | cliquer sur le bouton sans titre ni description | message d'erreur affiché, aucun appel à l'IA | Réussi |
+
+---
+
+## Fonctionnalité bonus — Génération titre/description par IA locale (Ollama) [RETIRÉE]
+
+> Fonctionnalité retirée du projet le 30/07/2026 (jugée redondante avec la saisie manuelle du titre/description). Route `POST /billets/reformulation`, champ "phrase courte" et bouton associés supprimés du code. Cas conservés ici à titre d'historique.
+
+### Serveur (route POST /billets/reformulation)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 92 | Génération à partir d'une phrase courte | texte="clavier ne fonctionne pas" | titre et description cohérents retournés | Retiré |
+| 93 | Génération à partir d'une autre phrase | texte="imprimante hors ligne depuis ce matin" | titre et description cohérents retournés | Retiré |
+| 94 | Champ texte manquant ou vide | texte="" ou absent | 400, "Décris brièvement le problème avant de générer." | Retiré |
+
+### Client (champ "phrase courte" + bouton "Générer titre et description (IA)")
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 95 | Génération appliquée aux champs | taper une phrase courte, cliquer sur le bouton | les champs Titre et Description se remplissent avec le résultat | Retiré |
+| 96 | Réinitialisation du champ phrase après succès | après une génération réussie | le champ "phrase courte" se vide | Retiré |
+| 97 | Champ vide | cliquer sur le bouton sans rien écrire | message d'erreur affiché, aucun appel à l'IA | Retiré |
+| 98 | Absent en mode modification | ouvrir un billet existant pour le modifier | le champ phrase courte et son bouton n'apparaissent pas | Retiré |
+
+---
+
+## Fonctionnalité bonus — Dépannage de niveau 1 par IA locale (Ollama)
+
+### Serveur (route POST /billets/depannage)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 99 | Étapes proposées pour un problème matériel | titre/description décrivant une imprimante hors service | 3 à 5 étapes de dépannage plausibles retournées | Réussi |
+| 100 | Étapes proposées pour un problème réseau | titre/description décrivant une panne wifi | étapes retournées, cohérentes avec le contexte | Réussi |
+| 101 | Champ titre ou description manquant | un des deux champs absent | 400, "Le titre et la description sont requis pour le dépannage." | Réussi |
+
+### Client (bouton "Voir des solutions de dépannage (IA)" + popup)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 102 | Étapes affichées dans une popup | remplir titre/description, cliquer sur le bouton | popup affichée avec une liste numérotée d'étapes | Réussi |
+| 103 | Fermeture via le bouton × | clic sur le × de la popup | popup se ferme, formulaire intact | Réussi |
+| 104 | Fermeture via le fond assombri | clic en dehors de la popup | popup se ferme, formulaire intact | Réussi |
+| 105 | Champs conservés après fermeture | fermer la popup | titre/description saisis restent inchangés | Réussi |
+| 106 | Champs vides | cliquer sur le bouton sans titre ni description | message d'erreur affiché, aucun appel à l'IA | Réussi |
+| 107 | Absent en mode modification | ouvrir un billet existant pour le modifier | le bouton de dépannage n'apparaît pas | Réussi |
+
+---
+
+## Livrable 2 — Fonctionnalité 1 : Sélecteur de vue Admin/Utilisateur
+
+### Client (boutons Utilisateur/Admin en haut de page)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 108 | Rôle par défaut au chargement | ouvrir la page | "Utilisateur" est actif par défaut | Réussi |
+| 109 | Bascule vers Admin | clic sur "Admin" | "Admin" devient actif, "Utilisateur" redevient inactif | Réussi |
+| 110 | Bascule vers Utilisateur | clic sur "Utilisateur" depuis Admin | "Utilisateur" redevient actif | Réussi |
+
+---
+
+## Livrable 2 — Fonctionnalité 2 : Vue Utilisateur limitée (création + consultation)
+
+### Client (restrictions selon le rôle actif)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 111 | Recherche visible en vue Utilisateur | rôle Utilisateur, onglet Liste | champ de recherche par mot-clé visible | Réussi |
+| 112 | Filtres avancés cachés en vue Utilisateur | rôle Utilisateur, onglet Liste | menus statut/priorité absents | Réussi |
+| 113 | Actions cachées en vue Utilisateur | rôle Utilisateur, onglet Liste | boutons Modifier/Supprimer absents, statut affiché en texte simple | Réussi |
+| 114 | Filtres visibles en vue Admin | rôle Admin, onglet Liste | menus statut/priorité affichés | Réussi |
+| 115 | Actions visibles en vue Admin | rôle Admin, onglet Liste | boutons Modifier/Supprimer présents, statut modifiable via menu déroulant | Réussi |
+
+---
+
+## Livrable 2 — Fonctionnalité 4 : Statistiques simples (nombre de billets par statut)
+
+### Client (onglet Accueil)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 116 | Décompte par statut affiché | ouvrir l'onglet Accueil | une carte par statut (Ouvert, En cours, Résolu, Fermé) avec le bon nombre | Réussi |
+| 117 | Total cohérent avec la somme des statuts | ouvrir l'onglet Accueil | la somme des 4 cartes égale le nombre total affiché | Réussi |
+| 118 | Indépendance des filtres de la liste | appliquer un filtre statut sur l'onglet Liste, puis revenir à Accueil | les statistiques affichent toujours le total réel, non filtré | Réussi |
+
+---
+
+## Livrable 2 — Fonctionnalité 2 (révisée) : Vue Utilisateur limitée à la création
+
+> Portée révisée : la vue Utilisateur ne donne plus accès aux onglets Accueil et Liste des billets (initialement prévu "création + consultation"). Seul l'onglet "Créer un billet" reste visible pour ce rôle.
+
+### Client (navigation par onglets selon le rôle)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 119 | Un seul onglet en vue Utilisateur | rôle Utilisateur (par défaut) | seul "Créer un billet" est visible dans la navigation | Réussi |
+| 120 | Trois onglets en vue Admin | basculer vers Admin | Accueil, Créer un billet et Liste des billets sont tous visibles | Réussi |
+| 121 | Retour forcé vers Création | depuis Admin sur un autre onglet, rebasculer vers Utilisateur | l'onglet actif redevient automatiquement "Créer un billet" | Réussi |
+
+---
+
+## Livrable 2 — Fonctionnalité 5 : Amélioration de l'interface et validation des formulaires
+
+### Serveur (services/billetService.js)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 122 | Priorité vide en création | priorite: "" | 400, "La priorité est obligatoire." | Réussi |
+| 123 | Priorité vide en modification | priorite: "" (PUT) | 400, "La priorité est obligatoire." | Réussi |
+
+### Client (formulaire de création/modification)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 124 | Soumission d'un formulaire entièrement vide | clic sur "Créer le billet" sans rien remplir | 4 messages d'erreur affichés (un par champ obligatoire), champs bordés en rouge | Réussi |
+| 125 | Aucun appel réseau si validation échoue | soumettre un formulaire invalide | aucune requête envoyée au serveur (validation bloquée côté client) | Réussi |
+| 126 | Correction d'un seul champ | remplir uniquement le titre après une soumission vide | le message d'erreur du titre disparaît, les 3 autres restent affichés | Réussi |
+| 127 | Astérisque sur les champs obligatoires | ouvrir le formulaire | Titre, Description, Catégorie et Priorité affichent un astérisque rouge | Réussi |
+| 128 | Soumission valide après correction complète | remplir tous les champs puis soumettre | billet créé normalement, aucune erreur affichée | Réussi |
+| 129 | Erreurs réinitialisées après succès | créer un billet avec succès, puis rouvrir le formulaire vide | aucun message d'erreur résiduel affiché | Réussi |
+
+---
+
+## Amélioration — Bascule thème sombre/clair
+
+### Client (bouton icône en haut à droite de l'écran)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 130 | Thème sombre par défaut au chargement | ouvrir la page | fond sombre, icône ☀️ affichée (proposant de passer au clair) | Réussi |
+| 131 | Bascule vers le thème clair | clic sur le bouton icône | fond de page ET fond des cartes deviennent clairs, texte reste lisible, icône devient 🌙 | Réussi |
+| 132 | Retour au thème sombre | clic sur le bouton icône depuis le thème clair | fond redevient sombre comme au départ, icône redevient ☀️ | Réussi |
+| 133 | Thème clair cohérent sur tous les onglets | basculer en clair, visiter Accueil, Créer un billet, Liste des billets | les trois vues affichent le thème clair sans zones oubliées | Réussi |
+| 134 | Bouton indépendant du sélecteur de rôle | ouvrir la page | le bouton de thème est isolé en haut à droite, séparé des boutons Utilisateur/Admin | Réussi |
+
+---
+
+## Amélioration — Cartes de statistiques agrandies
+
+### Client (onglet Accueil)
+
+| # | Description | Entrée | Résultat attendu | Statut |
+|---|---|---|---|---|
+| 135 | Cartes occupant toute la largeur disponible | ouvrir l'onglet Accueil | les 4 cartes de statuts se répartissent également sur toute la largeur de la carte "Bienvenue" | Réussi |
+
+---
+
 ## À venir
 
-Les fonctionnalités du Livrable 1 sont maintenant toutes complétées. Les tests des fonctionnalités du Livrable 2 seront ajoutés ici au fur et à mesure de leur développement.
+Les fonctionnalités des Livrables 1 et 2 sont maintenant toutes complétées.

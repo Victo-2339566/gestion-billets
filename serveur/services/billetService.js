@@ -9,7 +9,7 @@ const {
 const STATUTS_VALIDES = ['Ouvert', 'En cours', 'Résolu', 'Fermé'];
 
 // Valide les champs obligatoires communs à la création et à la modification
-function validerBillet({ titre, description, categorie }) {
+function validerBillet({ titre, description, categorie, priorite }) {
     if (!titre || titre.trim() === '') {
         throw new Error('Le titre est obligatoire.');
     }
@@ -18,6 +18,9 @@ function validerBillet({ titre, description, categorie }) {
     }
     if (!categorie || categorie.trim() === '') {
         throw new Error('La catégorie est obligatoire.');
+    }
+    if (!priorite || priorite.trim() === '') {
+        throw new Error('La priorité est obligatoire.');
     }
 }
 

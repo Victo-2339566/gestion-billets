@@ -1,12 +1,78 @@
+/* theme et apparence proposé par Claude IA */
+
 .conteneur {
     max-width: 900px;
     margin: 0 auto;
 }
 
+h1 {
+    text-shadow: 0 0 18px rgba(224, 41, 63, 0.45);
+}
+
+/* Petit accent sous le titre, pour marquer la couleur du thème */
+h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    margin-top: 10px;
+    background: linear-gradient(90deg, #e0293f, transparent);
+    border-radius: 2px;
+}
+
 .statut-serveur {
-    color: #666;
+    color: var(--texte-secondaire);
     font-size: 14px;
     margin-bottom: 24px;
+}
+
+/* Bouton icône pour basculer le thème, fixé en haut à droite de l'écran */
+.bouton-theme {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--fond-carte-alt);
+    border: 1px solid var(--bordure-forte);
+    border-radius: 50%;
+    font-size: 17px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.bouton-theme:hover {
+    border-color: #e0293f;
+}
+
+/* Sélecteur de rôle (Utilisateur / Admin) */
+.selecteur-role {
+    display: inline-flex;
+    border: 1px solid var(--bordure-forte);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.role-bouton {
+    padding: 6px 14px;
+    border: none;
+    background-color: var(--fond-carte-alt);
+    color: var(--texte-secondaire);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.role-bouton:first-child {
+    border-right: 1px solid var(--bordure-forte);
+}
+
+.role-actif {
+    background-color: #e0293f;
+    color: #fff;
 }
 
 /* Navigation par onglets (pas de routing, juste un changement de vue) */
@@ -14,7 +80,7 @@
     display: flex;
     gap: 4px;
     margin-bottom: 24px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--bordure);
 }
 
 .onglet {
@@ -22,19 +88,19 @@
     border: none;
     background: none;
     font-size: 14px;
-    color: #666;
+    color: var(--texte-secondaire);
     cursor: pointer;
     border-bottom: 2px solid transparent;
 }
 
 .onglet:hover {
-    color: #2563eb;
+    color: #e0293f;
 }
 
 .onglet-actif {
-    color: #2563eb;
+    color: #ff4d5e;
     font-weight: 600;
-    border-bottom-color: #2563eb;
+    border-bottom-color: #e0293f;
 }
 
 /* Message de statut (succès/erreur), disparaît automatiquement */
@@ -46,21 +112,21 @@
 }
 
 .message-succes {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #a5d6a7;
+    background-color: #14291c;
+    color: #4ade80;
+    border: 1px solid #2f6b3f;
 }
 
 .message-erreur {
-    background-color: #fdecea;
-    color: #c62828;
-    border: 1px solid #f5b5b0;
+    background-color: #2a1414;
+    color: #ff6b6b;
+    border: 1px solid #6b2c2c;
 }
 
 /* Formulaire de création/modification */
 .carte {
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
+    background-color: var(--fond-carte);
+    border: 1px solid var(--bordure);
     border-radius: 8px;
     padding: 20px 24px;
     margin-bottom: 32px;
@@ -69,6 +135,36 @@
 .carte h2 {
     margin-bottom: 16px;
     font-size: 18px;
+    color: var(--texte);
+}
+
+/* Statistiques par statut (onglet Accueil) */
+.statistiques {
+    display: flex;
+    gap: 20px;
+    margin-top: 24px;
+    justify-content: center;
+}
+
+.stat-carte {
+    flex: 1;
+    background-color: var(--fond-carte-alt);
+    border-radius: 8px;
+    border-left: 4px solid #e0293f;
+    padding: 24px;
+    text-align: center;
+}
+
+.stat-valeur {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ff4d5e;
+}
+
+.stat-etiquette {
+    font-size: 14px;
+    color: var(--texte-secondaire);
+    margin-top: 6px;
 }
 
 .formulaire-billet {
@@ -86,22 +182,48 @@
 .champ label {
     font-size: 13px;
     font-weight: 600;
-    color: #555;
+    color: var(--texte-secondaire);
 }
 
 .champ input,
 .champ textarea,
 .champ select {
     padding: 8px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--bordure-forte);
     border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
+    background-color: var(--fond-champ);
+    color: var(--texte);
+}
+
+.champ input:focus,
+.champ textarea:focus,
+.champ select:focus {
+    outline: none;
+    border-color: #e0293f;
+    box-shadow: 0 0 0 3px rgba(224, 41, 63, 0.2);
 }
 
 .champ textarea {
     resize: vertical;
     min-height: 60px;
+}
+
+/* Astérisque marquant les champs obligatoires */
+.obligatoire {
+    color: #ff6b6b;
+}
+
+/* Validation des formulaires : champ en erreur et message associé */
+.champ-invalide {
+    border-color: #ff6b6b !important;
+}
+
+.texte-erreur {
+    font-size: 12px;
+    color: #ff6b6b;
+    font-weight: 400;
 }
 
 .actions {
@@ -117,44 +239,60 @@
     border: none;
     font-size: 14px;
     cursor: pointer;
+    transition: background-color 0.15s, box-shadow 0.15s;
 }
 
 .bouton-principal {
-    background-color: #2563eb;
+    background-color: #e0293f;
     color: #fff;
 }
 
 .bouton-principal:hover {
-    background-color: #1d4ed8;
+    background-color: #b91c2c;
+    box-shadow: 0 0 12px rgba(224, 41, 63, 0.5);
 }
 
 .bouton-secondaire {
-    background-color: #eee;
-    color: #333;
+    background-color: #262020;
+    color: #e5e5e5;
+    border: 1px solid #3a2a2a;
 }
 
 .bouton-secondaire:hover {
-    background-color: #ddd;
+    background-color: #322828;
 }
 
 .bouton-danger {
-    background-color: #fff;
-    color: #c62828;
-    border: 1px solid #e0a5a1;
+    background-color: transparent;
+    color: #ff6b6b;
+    border: 1px solid #6b2c2c;
 }
 
 .bouton-danger:hover {
-    background-color: #fdecea;
+    background-color: #2a1414;
+}
+
+.bouton-ia {
+    background-color: #1c1710;
+    color: #eab308;
+    border: 1px solid #6b5410;
+}
+
+.bouton-ia:hover {
+    background-color: #2a2210;
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.35);
 }
 
 .champ-recherche {
     width: 100%;
     padding: 8px 12px;
     margin-bottom: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--bordure-forte);
     border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
+    background-color: var(--fond-champ);
+    color: var(--texte);
 }
 
 .filtres {
@@ -165,18 +303,20 @@
 
 .filtres select {
     padding: 8px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--bordure-forte);
     border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
+    background-color: var(--fond-champ);
+    color: var(--texte);
 }
 
 /* Liste des billets */
 .tableau-billets {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
-    border: 1px solid #e0e0e0;
+    background-color: var(--fond-carte);
+    border: 1px solid var(--bordure);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -186,13 +326,14 @@
     padding: 10px 12px;
     text-align: left;
     font-size: 14px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--bordure);
+    color: var(--texte);
 }
 
 .tableau-billets th {
-    background-color: #fafafa;
+    background-color: var(--fond-carte-alt);
     font-size: 13px;
-    color: #555;
+    color: #ff8080;
 }
 
 .tableau-billets tbody tr:last-child td {
@@ -200,14 +341,16 @@
 }
 
 .tableau-billets tbody tr:hover {
-    background-color: #f8f9fb;
+    background-color: var(--fond-survol);
 }
 
 .tableau-billets select {
     padding: 4px 6px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--bordure-forte);
     border-radius: 4px;
     font-size: 13px;
+    background-color: var(--fond-champ);
+    color: var(--texte);
 }
 
 .colonne-actions {
@@ -216,6 +359,65 @@
 }
 
 .aucun-billet {
-    color: #777;
+    color: var(--texte-secondaire);
     font-style: italic;
+}
+
+/* Popup (dépannage IA, etc.) */
+.modale-fond {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.modale-contenu {
+    background-color: var(--fond-carte);
+    border: 1px solid var(--bordure-forte);
+    border-radius: 8px;
+    padding: 20px 24px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(224, 41, 63, 0.25);
+}
+
+.modale-entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.modale-entete h3 {
+    font-size: 16px;
+    color: var(--texte);
+}
+
+.modale-fermer {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--texte-secondaire);
+    cursor: pointer;
+}
+
+.modale-fermer:hover {
+    color: #ff4d5e;
+}
+
+.modale-corps {
+    color: var(--texte);
+}
+
+.modale-corps ol {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
